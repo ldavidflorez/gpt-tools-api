@@ -30,7 +30,7 @@ async def cors_handler(request: Request, call_next):
         response.status_code = 200
 
     response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Origin"] = "https://aiwriter.sagioscode.com"
+    response.headers["Access-Control-Allow-Origin"] = "https://aiwriter.sagioscode.com,https://gpt-tools-view.onrender.com"
     response.headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,DELETE,OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
 
