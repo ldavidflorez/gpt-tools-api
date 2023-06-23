@@ -1,0 +1,12 @@
+fastapi==0.97.0
+openai==0.27.6
+passlib==1.7.4
+pydantic==1.10.7
+python-dotenv==1.0.0
+python_jose==3.3.0
+SQLAlchemy==2.0.12
+starlette==0.27.0
+transformers==4.29.1
+uvicorn==0.22.0
+PyMySQL==1.0.3
+python-multipart==0.0.6
