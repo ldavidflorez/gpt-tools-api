@@ -22,7 +22,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
             password={"tokenUrl": tokenUrl, "scopes": scopes})
         super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
 
-    async def __call__(self, request: Request) -> Optional[str]:
+    def __call__(self, request: Request) -> Optional[str]:
         authorization: str = request.cookies.get("access_token")
 
         scheme, param = get_authorization_scheme_param(authorization)

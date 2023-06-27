@@ -8,6 +8,10 @@ from typing import Optional
 from datetime import date
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 COST_BY_TOKEN = float(os.environ["COST_BY_TOKEN"])
 
@@ -16,7 +20,7 @@ router = APIRouter(prefix="/api/v1/tracker",
 
 
 @router.get("/historical")
-async def historical(
+def historical(
         start_date: Optional[date] = None, end_date: Optional[date] = None,
         user: dict = Depends(get_current_user), db: Session = Depends(get_db)):
     if user is None:
@@ -63,8 +67,8 @@ async def historical(
 
 
 @router.get("/historical/user/{user_id}")
-async def historical_by_user(user_id: int, user: dict = Depends(get_current_user), db: Session = Depends(get_db),
-                             start_date: Optional[date] = None, end_date: Optional[date] = None):
+def historical_by_user(user_id: int, user: dict = Depends(get_current_user), db: Session = Depends(get_db),
+                       start_date: Optional[date] = None, end_date: Optional[date] = None):
     if user is None:
         raise get_user_exception()
 
@@ -103,7 +107,8 @@ async def historical_by_user(user_id: int, user: dict = Depends(get_current_user
 
     if db.query(models.Users).filter(
             models.Users.id == user_id).first().subscription == "standard":
-        available_tokens = sum([r.available_tokens for r in user_permissions])
+        available_tokens = sum(
+            [r.available_tokens for r in user_permissions if r.available_tokens > 0])
         available_balance = round(available_tokens * COST_BY_TOKEN, 2)
     else:
         available_tokens = None
@@ -116,8 +121,8 @@ async def historical_by_user(user_id: int, user: dict = Depends(get_current_user
 
 
 @router.get("/historical/service/{service_id}")
-async def historical_by_service(service_id: int, user: dict = Depends(get_current_user), db: Session = Depends(get_db),
-                                start_date: Optional[date] = None, end_date: Optional[date] = None):
+def historical_by_service(service_id: int, user: dict = Depends(get_current_user), db: Session = Depends(get_db),
+                          start_date: Optional[date] = None, end_date: Optional[date] = None):
     if user is None:
         raise get_user_exception()
 
@@ -148,8 +153,8 @@ async def historical_by_service(service_id: int, user: dict = Depends(get_curren
 
 
 @router.get("/historical/{user_id}/{service_id}")
-async def historical_by_user(user_id: int, service_id: int, user: dict = Depends(get_current_user), db: Session = Depends(get_db),
-                             start_date: Optional[date] = None, end_date: Optional[date] = None):
+def historical_by_user_and_service(user_id: int, service_id: int, user: dict = Depends(get_current_user), db: Session = Depends(get_db),
+                                   start_date: Optional[date] = None, end_date: Optional[date] = None):
     if user is None:
         raise get_user_exception()
 

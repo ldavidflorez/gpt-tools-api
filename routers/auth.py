@@ -5,12 +5,14 @@ from security.oauth2 import OAuth2PasswordBearerWithCookie
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 from database.database import get_db
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
 
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
 SECRET_KEY = os.environ["SECRET_KEY"]
 ALGORITHM = os.environ["ALGORITHM"]
@@ -19,6 +21,7 @@ EXPIRATION_MINUTES = int(os.environ["EXPIRATION_MINUTES"])
 bcrypt_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_bearer = OAuth2PasswordBearerWithCookie(tokenUrl="/api/v1/auth/login")
+# oauth2_bearer = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 router = APIRouter(prefix="/api/v1/auth",
                    tags=["Authentication"])
@@ -44,7 +47,7 @@ def create_access_token(username: str, user_id: int, user_role: str, subscriptio
     return jwt.encode(encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
-async def get_current_user(token: str = Depends(oauth2_bearer), db: Session = Depends(get_db)):
+def get_current_user(token: str = Depends(oauth2_bearer), db: Session = Depends(get_db)):
     old_token = db.query(models.InvalidJWT).filter(
         models.InvalidJWT.token == token).first()
     if old_token:
@@ -64,7 +67,7 @@ async def get_current_user(token: str = Depends(oauth2_bearer), db: Session = De
 
 
 @router.post("/login")
-async def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends(),
+def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestForm = Depends(),
                                  db: Session = Depends(get_db)):
     user = authenticate_user(form_data.username, form_data.password, db)
     if not user:
@@ -79,12 +82,12 @@ async def login_for_access_token(response: Response, form_data: OAuth2PasswordRe
     token = create_access_token(
         user.username, user.id, user.role, user.subscription, token_expires, permissions_list)
     response.set_cookie(
-        key="access_token", value=f"Bearer {token}", httponly=True, secure=True, samesite="none")
+        key="access_token", value=f"Bearer {token}", httponly=True, secure=False, samesite="lax")
     return {"access_token": token, "token_type": "Bearer"}
 
 
 @router.post("/logout")
-async def logout(response: Response, token: str = Depends(oauth2_bearer), db: Session = Depends(get_db)):
+def logout(response: Response, token: str = Depends(oauth2_bearer), db: Session = Depends(get_db)):
     response.delete_cookie("access_token")
 
     token_model = models.InvalidJWT()

@@ -2,6 +2,7 @@ import logger.app_logger as app_logger
 from logger.app_logger_formatter import CustomFormatter
 from fastapi import FastAPI
 from http import HTTPStatus
+from fastapi.middleware.cors import CORSMiddleware
 import models.models as models
 from database.database import engine
 from routers import auth, user, service, tracker, gpt
@@ -30,7 +31,7 @@ async def cors_handler(request: Request, call_next):
         response.status_code = 200
 
     response.headers["Access-Control-Allow-Credentials"] = "true"
-    response.headers["Access-Control-Allow-Origin"] = "https://aiwriter.sagioscode.com"
+    response.headers["Access-Control-Allow-Origin"] = "http://localhost:8080"
     response.headers["Access-Control-Allow-Methods"] = "GET,PUT,POST,DELETE,OPTIONS"
     response.headers["Access-Control-Allow-Headers"] = "Content-Type,Authorization"
 
@@ -77,8 +78,8 @@ async def log_request(request: Request, call_next):
 
 
 app.middleware("http")(cors_handler)
-app.middleware("http")(log_request)
 app.middleware("http")(catch_exceptions_middleware)
+# app.middleware("http")(log_request)
 
 app.include_router(auth.router)
 app.include_router(user.router)
@@ -88,5 +89,5 @@ app.include_router(gpt.router)
 
 
 @app.get("/ping")
-async def ping():
+def ping():
     return {"detail": "pong"}

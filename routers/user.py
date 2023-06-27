@@ -58,7 +58,7 @@ class UpdateUserAdmin(BaseModel):
 
 
 @router.post("/register")
-async def create_user(new_user: CreateUser, current_user: dict = Depends(get_current_user),
+def create_user(new_user: CreateUser, current_user: dict = Depends(get_current_user),
                       db: Session = Depends(get_db)):
     if current_user is None:
         raise get_user_exception()

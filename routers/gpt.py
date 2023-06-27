@@ -11,6 +11,9 @@ from utils.openai_api import get_response
 from transformers import GPT2TokenizerFast
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 MAX_TOKENS = int(os.environ["MAX_TOKENS"])
 
@@ -98,9 +101,9 @@ async def lang_detection(prompt: PromptBase, user: dict = Depends(get_current_us
         if response is not None:
             return response
 
-    response = get_response(prompt_template)
+    response = await get_response(prompt_template)
 
-    consumed_tokens = response.usage.total_tokens
+    consumed_tokens = response["usage"]["total_tokens"]
 
     tracker_model = models.Tracking()
     tracker_model.user_id = user["id"]
@@ -147,14 +150,14 @@ async def lang_translation(prompt: PromptTranslation, user: dict = Depends(get_c
         if response is not None:
             return response
 
-    response = get_response(prompt_template)
+    response = await get_response(prompt_template)
 
-    consumed_tokens = response.usage.total_tokens
+    consumed_tokens = response["usage"]["total_tokens"]
 
     tracker_model = models.Tracking()
     tracker_model.user_id = user["id"]
     tracker_model.service_id = service_id
-    tracker_model.consumed_tokens = response.usage.total_tokens
+    tracker_model.consumed_tokens = consumed_tokens
 
     if user["subscription"] != "premium":
         service_state = db.query(models.Permissions).filter(models.Permissions.user_id == user["id"]).filter(
@@ -196,14 +199,14 @@ async def sentiment_detect(prompt: PromptBase, user: dict = Depends(get_current_
         if response is not None:
             return response
 
-    response = get_response(prompt_template)
+    response = await get_response(prompt_template)
 
-    consumed_tokens = response.usage.total_tokens
+    consumed_tokens = response["usage"]["total_tokens"]
 
     tracker_model = models.Tracking()
     tracker_model.user_id = user["id"]
     tracker_model.service_id = service_id
-    tracker_model.consumed_tokens = response.usage.total_tokens
+    tracker_model.consumed_tokens = consumed_tokens
 
     if user["subscription"] != "premium":
         service_state = db.query(models.Permissions).filter(models.Permissions.user_id == user["id"]).filter(
@@ -246,14 +249,14 @@ async def intent_detection(prompt: PromptIntent, user: dict = Depends(get_curren
         if response is not None:
             return response
 
-    response = get_response(prompt_template)
+    response = await get_response(prompt_template)
 
-    consumed_tokens = response.usage.total_tokens
+    consumed_tokens = response["usage"]["total_tokens"]
 
     tracker_model = models.Tracking()
     tracker_model.user_id = user["id"]
     tracker_model.service_id = service_id
-    tracker_model.consumed_tokens = response.usage.total_tokens
+    tracker_model.consumed_tokens = consumed_tokens
 
     if user["subscription"] != "premium":
         service_state = db.query(models.Permissions).filter(models.Permissions.user_id == user["id"]).filter(
@@ -299,14 +302,14 @@ async def summarize(prompt: PromptBase, user: dict = Depends(get_current_user),
         if response is not None:
             return response
 
-    response = get_response(prompt_template)
+    response = await get_response(prompt_template)
 
-    consumed_tokens = response.usage.total_tokens
+    consumed_tokens = response["usage"]["total_tokens"]
 
     tracker_model = models.Tracking()
     tracker_model.user_id = user["id"]
     tracker_model.service_id = service_id
-    tracker_model.consumed_tokens = response.usage.total_tokens
+    tracker_model.consumed_tokens = consumed_tokens
 
     if user["subscription"] != "premium":
         service_state = db.query(models.Permissions).filter(models.Permissions.user_id == user["id"]).filter(
@@ -357,14 +360,14 @@ async def writer(prompt: PromptWriter, user: dict = Depends(get_current_user),
         if response is not None:
             return response
 
-    response = get_response(prompt_template)
+    response = await get_response(prompt_template)
 
-    consumed_tokens = response.usage.total_tokens
+    consumed_tokens = response["usage"]["total_tokens"]
 
     tracker_model = models.Tracking()
     tracker_model.user_id = user["id"]
     tracker_model.service_id = service_id
-    tracker_model.consumed_tokens = response.usage.total_tokens
+    tracker_model.consumed_tokens = consumed_tokens
 
     if user["subscription"] != "premium":
         service_state = db.query(models.Permissions).filter(models.Permissions.user_id == user["id"]).filter(

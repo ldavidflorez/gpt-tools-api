@@ -1,21 +1,28 @@
-import openai
+import openai_async
+import json
 
 import os
+from dotenv import load_dotenv
 
-openai.api_key = os.environ["OPENAI_API_KEY"]
+load_dotenv()
+
+api_key = os.environ["OPENAI_API_KEY"]
+model = os.environ["ENGINE"]
+temperature = float(os.environ["TEMPERATURE"])
+max_tokens = int(os.environ["MAX_TOKENS"])
 
 
-def get_response(prompt: str):
+async def get_response(prompt: str):
     # generate the response
-    response = openai.Completion.create(
-        engine=os.environ["ENGINE"],
-        prompt=prompt,
-        temperature=float(os.environ["TEMPERATURE"]),
-        max_tokens=int(os.environ["MAX_TOKENS"]),
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0,
-        stop=["12."]
+    response = await openai_async.complete(
+        api_key,
+        timeout=10,
+        payload={
+            "model": model,
+            "prompt": prompt,
+            "temperature": temperature,
+            "max_tokens": max_tokens
+        }
     )
 
-    return response
+    return json.loads(response.text)
