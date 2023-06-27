@@ -82,7 +82,7 @@ def login_for_access_token(response: Response, form_data: OAuth2PasswordRequestF
     token = create_access_token(
         user.username, user.id, user.role, user.subscription, token_expires, permissions_list)
     response.set_cookie(
-        key="access_token", value=f"Bearer {token}", httponly=True, secure=False, samesite="none")
+        key="access_token", value=f"Bearer {token}", httponly=True, secure=True, samesite="none")
     return {"access_token": token, "token_type": "Bearer"}
 
 
